@@ -3,14 +3,14 @@
 > **👤 普通用户 30 秒指南（不懂 Linux 运维先看这里）：**
 > 1. **不用自己看懂下面 600 行命令！** 本文是专门写给 **Claude Code、Codex、Antigravity** 等电脑端 AI 工具一步步自动执行的部署手册。
 > 2. **你只需要提前准备 3 件事**：① 一台 Linux 云服务器（Debian 11+ / Ubuntu 20.04+，记录公网 IP 和 `root` 登录信息）；② 在云厂商网页后台的安全组/防火墙里放行 **TCP 80 和 443 端口**；③ （可选）把自己的域名解析到这台服务器 IP（没域名也能直接用公网 IP）。
-> 3. **直接把下面这段话复制给电脑上的 Claude Code / Codex**（不要发给网页版聊天框），等它跑完后，你只需照着最底部的 **[步骤 13](#步骤-13-真实接入由用户在-mac--iphone-上人工完成)** 把地址填回 CordCode Link 即可：
->
-> ```text
-> 请严格按以下部署手册，帮我在我的 Linux VPS 上自建 CordCode Relay：
-> https://raw.githubusercontent.com/openAgi2/cordcode-link/main/relay-server/INSTALL.md
->
-> 请先向我确认部署模式（有域名还是纯公网 IP）、域名/公网 IP 以及 VPS SSH 信息，再严格按手册中的验收门逐步执行，不要跳过检查或降级为自签名证书。
-> ```
+> 3. **把下面这段话直接复制给电脑上的 Claude Code / Codex**（不要发给网页版聊天框），等它跑完后，你只需照着最底部的 **[步骤 13](#步骤-13-真实接入由用户在-mac--iphone-上人工完成)** 把地址填回 CordCode Link 即可：
+
+```text
+请严格按以下部署手册，帮我在我的 Linux VPS 上自建 CordCode Relay：
+https://raw.githubusercontent.com/openAgi2/cordcode-link/main/relay-server/INSTALL.md
+
+请先向我确认部署模式（有域名还是纯公网 IP）、域名/公网 IP 以及 VPS SSH 信息，再严格按手册中的验收门逐步执行，不要跳过检查或降级为自签名证书。
+```
 
 ---
 

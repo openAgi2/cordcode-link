@@ -33,7 +33,7 @@ https://raw.githubusercontent.com/openAgi2/cordcode-link/main/relay-server/INSTA
 等 AI 告诉你部署并验收通过、给你一个 `wss://<你的域名或公网IP>` 地址后：
 1. 在 Mac 上打开 **CordCode Link** →「连接状态」→「Relay」→「中继服务器」→「更改…」→ 切到 **「自定义中继」**。
 2. 把 `wss://<你的域名或公网IP>` 粘贴进去并点击保存，等待状态变成 **「已接入中继网 / 已连接」**。
-3. 切换新服务器后，需要用 **iOS 二维码** 重新在手机上扫一次配对（在 Mac 上点同意即可）。
+3. 切换新服务器后，在主界面点击 **「扫码配对新设备」** 显示 **iOS 二维码**，用手机重新扫一次并在 Mac 上点同意即可。
 
 遇到问题欢迎进 [Telegram 交流群](https://t.me/+4wBkquLet2JhMjZk) 或在 [GitHub Issues](https://github.com/openAgi2/cordcode-link/issues) 提问。
 
