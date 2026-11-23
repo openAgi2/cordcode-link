@@ -1,0 +1,9 @@
+.DS_Store
+*.db
+*.db-wal
+*.db-shm
+dist/
+cordcode-relay-*
+relay-server/relay-server
+*.zip
+*.sha256
