@@ -1,8 +1,20 @@
 # CordCode Relay 自建部署手册（支持有域名 / 公网 IP 直连）
 
-> 本手册面向「想在自己的 VPS 上部署 CordCode 中继」的用户，并按**「可直接交给任何 coding agent（Claude Code / Codex / Antigravity 等）自动执行」**的标准编写：所有命令、配置文件全文与验收门均自包含于本文，无需额外上下文。
+> **👤 普通用户 30 秒指南（不懂 Linux 运维先看这里）：**
+> 1. **不用自己看懂下面 600 行命令！** 本文是专门写给 **Claude Code、Codex、Antigravity** 等电脑端 AI 工具一步步自动执行的部署手册。
+> 2. **你只需要提前准备 3 件事**：① 一台 Linux 云服务器（Debian 11+ / Ubuntu 20.04+，记录公网 IP 和 `root` 登录信息）；② 在云厂商网页后台的安全组/防火墙里放行 **TCP 80 和 443 端口**；③ （可选）把自己的域名解析到这台服务器 IP（没域名也能直接用公网 IP）。
+> 3. **直接把下面这段话复制给电脑上的 Claude Code / Codex**（不要发给网页版聊天框），等它跑完后，你只需照着最底部的 **[步骤 13](#步骤-13-真实接入由用户在-mac--iphone-上人工完成)** 把地址填回 CordCode Link 即可：
 >
-> 覆盖两种标准形态（二选一，均采用标准 TCP 443 TLS + Nginx 反代 + systemd 常驻，**不部署任何网站**）：
+> ```text
+> 请严格按以下部署手册，帮我在我的 Linux VPS 上自建 CordCode Relay：
+> https://raw.githubusercontent.com/openAgi2/cordcode-link/main/relay-server/INSTALL.md
+>
+> 请先向我确认部署模式（有域名还是纯公网 IP）、域名/公网 IP 以及 VPS SSH 信息，再严格按手册中的验收门逐步执行，不要跳过检查或降级为自签名证书。
+> ```
+
+---
+
+> 本手册覆盖两种标准形态（二选一，均采用标准 TCP 443 TLS + Nginx 反代 + systemd 常驻，**不部署任何网站**）：
 > - **模式 A（有域名，推荐）**：`wss://<你的域名>`，Let's Encrypt 常规 90 天证书 + 自动续期（附可选 Cloudflare 代理要点）。
 > - **模式 B（纯公网 IP，无域名）**：`wss://<你的公网IP>`，Let's Encrypt `shortlived` IP 证书 + 每日两次自动续期检查。
 
@@ -14,7 +26,7 @@
 4. **秘密不出现在输出里**：provisioning token、证书私钥、API 凭据不打印、不写进任何会提交的文件；`relay.env` 只存 token 的 SHA-256 摘要。
 5. **长命令必须有超时**：所有可能等待网络的命令（下载 / 签发 / 续期）都要包在 `timeout --signal=TERM --kill-after=5s <秒数>` 中；单条命令 5 分钟无有效进展即终止并排查，不无限等待。
 6. **只做本手册内的事**：不重启或修改与部署无关的服务，不清理无关文件；遇到 80/443/8780 被未知服务占用（见步骤 1）→ 停止并向用户报告。
-7. **完成后如实汇报**：列出通过的验收门与未执行项（尤其「步骤 8：真实 Mac/iPhone 接入」由用户人工完成，agent 不得宣称代替）。
+7. **完成后如实汇报**：列出通过的验收门与未执行项（尤其「步骤 13：真实 Mac/iPhone 接入」由用户人工完成，agent 不得宣称代替）。
 
 ## 1. 参数收集与分支决策（Agent 开工第一步）
 
@@ -43,7 +55,7 @@
 | 公网入口 | 模式 A：已将域名 `A` 记录指向 VPS 公网 IPv4；模式 B：静态公网 IPv4 |
 | 安全组 / 防火墙 | 入方向放开 **TCP 22 / 80 / 443**（80 为 Let's Encrypt HTTP-01 签发与续期必需，443 为 Relay 入口） |
 | `relay-server` 二进制 | `linux/amd64` 或 `linux/arm64`（与 VPS `uname -m` 一致），配对 `.sha256` 校验文件 |
-| 一台 Mac | 已安装 CordCode Link（MacBridge），用于步骤 8 真实接入验收 |
+| 一台 Mac | 已安装 CordCode Link，用于步骤 13 真实接入验收 |
 
 ```text
 iPhone / Mac（CordCode 客户端）
@@ -154,7 +166,7 @@ file /opt/cordcode-relay/bin/relay-server   # 应显示 ELF 64-bit ... staticall
 
 ### 步骤 5 provisioning token 与环境文件
 
-provisioning token 仅用于步骤 7 的运维 API 验收（日常 MacBridge 走 Ed25519 自助签名激活，不需要此 token）。**明文仅存一份在 `/root` 下，环境文件只保存 SHA-256 摘要**：
+provisioning token 仅用于步骤 12 的运维 API 验收（日常 CordCode Link 走 Ed25519 自助签名激活，不需要此 token）。**明文仅存一份在 `/root` 下，环境文件只保存 SHA-256 摘要**：
 
 ```bash
 TOKEN="$(openssl rand -base64 48)"
@@ -177,7 +189,7 @@ chmod 0600 /etc/cordcode-relay/relay.env
 ```
 
 > 关键约束：
-> - `RELAY_PUBLIC_ENDPOINT` 必须与将来在 MacBridge 中填写的自定义中继地址完全一致（根地址，不带路径、不带 `:443`、不带尾斜杠）。
+> - `RELAY_PUBLIC_ENDPOINT` 必须与将来在 CordCode Link 中填写的自定义中继地址完全一致（根地址，不带路径、不带 `:443`、不带尾斜杠）。
 > - `RELAY_MAX_FRAME_BYTES` 保持 `33554432`（32 MiB），**不要调低至 2 MiB**，否则长会话全量同步会触发 WebSocket close 1009 断连循环。
 
 ### 步骤 6 systemd 服务（全文照抄）
@@ -571,9 +583,9 @@ go test ./internal/relay -run TestLiveRelayDeployment -count=1
 1. Mac 打开 **CordCode Link** →「连接状态」→「Relay」→「中继服务器」→「更改…」→「自定义中继」。
 2. 填入 `wss://${RELAY_HOST}`（不带端口、路径或尾斜杠），点击保存。
 3. 等待 Relay 状态显示**已接入中继网 / 已连接**（「配置已应用」只代表配置保存完成，不是已连接证据）。
-4. 切换新节点后旧节点的配对凭据不会自动迁移：打开 **iOS 二维码**，在 iPhone 的 CordCode App 扫码并在 Mac 上批准配对。
+4. 切换新节点后旧节点的配对凭据不会自动迁移：在主界面点击「扫码配对新设备」显示 **iOS 二维码**，在 iPhone 的 CordCode App 里扫码并在 Mac 上批准配对。
 5. iPhone 断开同一 WiFi（切蜂窝网络）验证远程可用：能看到会话列表、发消息能收到流式回复。
-6. 本节点未部署 `/web/`，**Web 二维码不可用**（预期行为，非故障）。
+6. 配对时请选择 **iOS 二维码**；自建中继只服务手机 App，不包含网页版，因此界面里的「Web 二维码」不可用属于正常情况。
 
 ## 6. 日常维护与排障
 
